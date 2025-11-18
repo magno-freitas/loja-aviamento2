@@ -256,6 +256,5 @@ com.loja.lojaaviamento
 
 ---
 
-**Data:** Janeiro 2025  
-**Versão:** 1.0  
-**Autor:** Sistema SAEP 2025
+**Data:** 18/11/2025   
+**Autor:** Magno Valadares de Freitas

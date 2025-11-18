@@ -7,14 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/dashboard";
-    }
 
-    @GetMapping("/dashboard")
-    public String Index(Model model ){
-        return "principal"; // carrega o template templates/principal.html
 
-    }
+
 }

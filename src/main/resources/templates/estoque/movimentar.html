@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimentar Estoque - Loja de Aviamentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="bi bi-shop"></i> Loja de Aviamentos
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="btn btn-outline-light btn-sm" href="/estoque">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="bi bi-arrow-left-right"></i> Movimentar Estoque</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Informações do Produto -->
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-box-seam"></i> <span th:text="${produto.nome}"></span></h5>
+                            <p class="mb-1"><strong>Categoria:</strong> <span th:text="${produto.categoria.nome}"></span></p>
+                            <p class="mb-1"><strong>Estoque Atual:</strong> 
+                                <span th:class="${produto.quantidadeEstoque <= produto.estoqueMinimo ? 'badge bg-danger' : 'badge bg-success'}"
+                                      th:text="${produto.quantidadeEstoque}"></span>
+                            </p>
+                            <p class="mb-0"><strong>Estoque Mínimo:</strong> <span th:text="${produto.estoqueMinimo}"></span></p>
+                        </div>
+
+                        <!-- Formulário de Movimentação -->
+                        <form action="/estoque/movimentar" method="post">
+                            <input type="hidden" name="produtoId" th:value="${produto.id}">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="tipo" class="form-label">Tipo de Movimentação *</label>
+                                        <select class="form-select" name="tipo" id="tipo" required>
+                                            <option value="">Selecione o tipo</option>
+                                            <option value="ENTRADA">Entrada (Adicionar ao estoque)</option>
+                                            <option value="SAIDA">Saída (Remover do estoque)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="quantidade" class="form-label">Quantidade *</label>
+                                        <input type="number" class="form-control" name="quantidade" id="quantidade" 
+                                               min="1" required placeholder="Digite a quantidade">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="observacao" class="form-label">Observação</label>
+                                <textarea class="form-control" name="observacao" id="observacao" rows="3"
+                                          placeholder="Observações sobre a movimentação (opcional)"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Data da Movimentação</label>
+                                <input type="text" class="form-control" th:value="${#temporals.format(dataAtual, 'dd/MM/yyyy')}" 
+                                       readonly>
+                                <small class="text-muted">A data e hora serão registradas automaticamente</small>
+                            </div>
+
+                            <!-- Alerta para Saída -->
+                            <div id="alertaSaida" class="alert alert-warning d-none">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>Atenção:</strong> Verifique se a quantidade não excede o estoque disponível.
+                                <br>Estoque atual: <strong th:text="${produto.quantidadeEstoque}"></strong> unidades.
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/estoque" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Registrar Movimentação
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mostrar alerta quando selecionar saída
+        document.getElementById('tipo').addEventListener('change', function() {
+            const alertaSaida = document.getElementById('alertaSaida');
+            if (this.value === 'SAIDA') {
+                alertaSaida.classList.remove('d-none');
+            } else {
+                alertaSaida.classList.add('d-none');
+            }
+        });
+
+        // Validação adicional no envio do formulário
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const tipo = document.getElementById('tipo').value;
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+            const estoqueAtual = [[${produto.quantidadeEstoque}]];
+
+            if (tipo === 'SAIDA' && quantidade > estoqueAtual) {
+                e.preventDefault();
+                alert('Quantidade de saída (' + quantidade + ') não pode ser maior que o estoque atual (' + estoqueAtual + ')');
+                return false;
+            }
+
+            return confirm('Confirma a movimentação de ' + tipo.toLowerCase() + ' de ' + quantidade + ' unidades?');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Loja de Aviamentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="bi bi-shop"></i> Loja de Aviamentos
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="bi bi-person-circle"></i> <span th:text="${nomeUsuario}"></span>
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="/logout">
+                    <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+                <hr>
+            </div>
+        </div>
+
+        <!-- Cards de Resumo e total produtos -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Total de Produtos</h5>
+                                <h3 th:text="${totalProdutos}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-box-seam fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Estoque Baixo</h5>
+                                <h3 th:text="${#lists.size(produtosEstoqueBaixo)}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-exclamation-triangle fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Sistema</h5>
+                                <h6>Funcionando</h6>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-check-circle fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Principal -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="bi bi-box-seam"></i> Gestão de Produtos</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Cadastre, edite e gerencie todos os produtos da loja.</p>
+                        <a href="/produtos" class="btn btn-info">
+                            <i class="bi bi-arrow-right-circle"></i> Acessar Produtos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="bi bi-clipboard-data"></i> Gestão de Estoque</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Controle entrada e saída de mercadorias.</p>
+                        <a href="/estoque" class="btn btn-success">
+                            <i class="bi bi-arrow-right-circle"></i> Acessar Estoque
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas de Estoque Baixo -->
+        <div th:if="${not #lists.isEmpty(produtosEstoqueBaixo)}" class="row mb-4">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Produtos com Estoque Baixo</h5>
+                    <ul class="mb-0">
+                        <li th:each="produto : ${produtosEstoqueBaixo}">
+                            <strong th:text="${produto.nome}"></strong> - 
+                            Estoque: <span th:text="${produto.quantidadeEstoque}"></span> 
+                            (Mínimo: <span th:text="${produto.estoqueMinimo}"></span>)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimas Movimentações -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-clock-history"></i> Últimas Movimentações</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(ultimasMovimentacoes)}" class="text-muted">
+                            Nenhuma movimentação registrada.
+                        </div>
+                        <div th:if="${not #lists.isEmpty(ultimasMovimentacoes)}">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Produto</th>
+                                            <th>Tipo</th>
+                                            <th>Quantidade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="mov : ${ultimasMovimentacoes}">
+                                            <td th:text="${#temporals.format(mov.dataMovimentacao, 'dd/MM/yyyy HH:mm')}"></td>
+                                            <td th:text="${mov.produto.nome}"></td>
+                                            <td>
+                                                <span th:if="${mov.tipo.name() == 'ENTRADA'}" class="badge bg-success">Entrada</span>
+                                                <span th:if="${mov.tipo.name() == 'SAIDA'}" class="badge bg-danger">Saída</span>
+                                            </td>
+                                            <td th:text="${mov.quantidade}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

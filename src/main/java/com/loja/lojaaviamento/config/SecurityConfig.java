@@ -43,8 +43,9 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                 .requestMatchers("/cadastro").permitAll()
+                .requestMatchers("/dashboard", "/produtos/**", "/estoque/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/usuarios").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/form").hasRole("ADMIN")
                 .requestMatchers("/usuario").hasRole("ADMIN")
@@ -54,7 +55,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/usuarios", true)
+                .defaultSuccessUrl("/dashboard", true)
                 .permitAll()
             )
             .logout(logout -> logout
